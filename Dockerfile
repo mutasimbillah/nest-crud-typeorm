@@ -1,28 +1,21 @@
-FROM node:14.17-alpine As development
+#define the latest nodejs image  to build from
+FROM node:12-alpine
 
-WORKDIR /usr/src/app
+#install git
+RUN apk add --no-cache git
 
+# create working folder and give permission
+RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
+
+#create a working directory
+WORKDIR /home/node/app
+
+#copy package.json file under the working directory
 COPY package*.json ./
+# install all the dependencies
+USER node
 
-RUN npm install --only=development
-
-COPY . .
-
-RUN npm run build
-
-FROM node:14.17-alpine as production
-
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-RUN npm install --only=production
-
-COPY . .
-
-COPY --from=development /usr/src/app/dist ./dist
-
-CMD ["node", "dist/main"]
+RUN npm install
+#copy all your files under the working directory
+#start nodejs server
+CMD [ "npm", "start" ]
