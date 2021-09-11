@@ -25,11 +25,25 @@ services:
     ports:
       - ${DOCKER_POSTGRES_PORT}:${POSTGRES_PORT}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data=/var/lib/postgresql/data
     environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    networks:
+      - example-back
+  postgres_adminer:
+    image: wodby/adminer:4.7
+    container_name: example_postgres_adminer
+    environment:
+      - ADMINER_DEFAULT_DB_DRIVER=pgsql
+      - ADMINER_DEFAULT_DB_HOST=postgres_db
+      - ADMINER_DEFAULT_DB_NAME=${POSTGRES_DB}
+      - ADMINER_DESIGN=nette
+    depends_on:
+      - postgres_db
+    ports:
+      - ${DOCKER_ADMINER_PORT}:9000
     networks:
       - example-back
 networks:
